@@ -24,6 +24,7 @@ The backend builds the AI context before sending the message to OpenAI.
 ## Main Features
 
 - Responsive AI chat interface.
+- First-time welcome screen with frontend-only mock login.
 - Six specialized assistants.
 - Assistant cards loaded from backend data.
 - Internal skill stacks for each assistant.
@@ -133,6 +134,7 @@ The debug endpoints only run when debug routes are enabled. Keep `ENABLE_DEBUG_R
 - The Knowledge Base currently has 14 Markdown files, but still needs more real project summaries.
 - Knowledge matching is weighted keyword and phrase matching, not semantic search.
 - There is no database or saved cloud history.
+- The login screen is mock authentication only and does not create real accounts.
 - Rate limiting is in memory, so it is simple but not production-grade.
 - Debug endpoints expose prompt previews, so they must stay disabled in production.
 

@@ -8,7 +8,76 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <div class="app-shell">
+    <section class="welcome-screen" id="welcomeScreen" aria-labelledby="welcomeTitle">
+      <div class="welcome-content">
+        <div class="welcome-hero">
+          <a class="welcome-brand" href="#" aria-label="StudyMate AI">
+            <img src="assets/studymate-logo.svg" alt="StudyMate AI" />
+          </a>
+          <p class="eyebrow">AI learning platform for Multimedia Design</p>
+          <h1 id="welcomeTitle">Your study workspace with focused AI assistants.</h1>
+          <p class="welcome-intro">
+            StudyMate AI helps you move from loose notes to clear study actions, project decisions,
+            exam arguments, and code explanations.
+          </p>
+        </div>
+
+        <form class="login-panel" id="loginForm" aria-label="Demo login">
+          <div>
+            <p class="eyebrow">Demo login</p>
+            <h2>Start your session</h2>
+            <p>
+              This is mock authentication. It only unlocks the frontend demo and does not create an account.
+            </p>
+          </div>
+
+          <label for="userNameInput">
+            Name
+            <input
+              id="userNameInput"
+              name="userName"
+              type="text"
+              autocomplete="name"
+              placeholder="Martin"
+              maxlength="32"
+              required
+            />
+          </label>
+
+          <label for="studyFocusInput">
+            Main focus today
+            <select id="studyFocusInput" name="studyFocus">
+              <option value="UX assignment">UX assignment</option>
+              <option value="JavaScript practice">JavaScript practice</option>
+              <option value="Portfolio improvement">Portfolio improvement</option>
+              <option value="Exam preparation">Exam preparation</option>
+            </select>
+          </label>
+
+          <button class="primary-button" type="submit">Continue to dashboard</button>
+          <p class="login-note">
+            Your API key still stays in the backend. Nothing from this form is sent to OpenAI.
+          </p>
+        </form>
+
+        <div class="benefit-grid" aria-label="StudyMate AI benefits">
+          <article class="benefit-card">
+            <strong>Specialized assistants</strong>
+            <p>Choose the right AI role for coding, UX, design critique, exams, or planning.</p>
+          </article>
+          <article class="benefit-card">
+            <strong>Project-aware answers</strong>
+            <p>Use local Knowledge Base context instead of asking a generic chatbot from zero.</p>
+          </article>
+          <article class="benefit-card">
+            <strong>Built for learning</strong>
+            <p>Get explanations that stay practical enough to understand and present yourself.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="app-shell is-hidden" id="appShell">
       <aside class="sidebar" aria-label="StudyMate assistants">
         <a class="brand" href="#" aria-label="StudyMate AI home">
           <img src="assets/studymate-favicon.svg" alt="" class="brand-icon" />
@@ -17,6 +86,15 @@
             <small>AI study workspace</small>
           </span>
         </a>
+
+        <div class="session-card" aria-label="Current demo session">
+          <span class="session-avatar" id="sessionAvatar" aria-hidden="true">M</span>
+          <span>
+            <strong id="sessionName">Martin</strong>
+            <small id="sessionFocus">UX assignment</small>
+          </span>
+          <button class="sign-out-button" id="signOutButton" type="button">Sign out</button>
+        </div>
 
         <div class="sidebar-section">
           <p class="sidebar-label">Assistants</p>
@@ -36,8 +114,8 @@
         </section>
 
         <div class="phase-note">
-          <strong>KB-8</strong>
-          <span>Knowledge-aware assistant demo</span>
+          <strong>FTX-1</strong>
+          <span>Welcome and mock login demo</span>
         </div>
       </aside>
 

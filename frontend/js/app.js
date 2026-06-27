@@ -1,3 +1,12 @@
+const welcomeScreen = document.querySelector("#welcomeScreen");
+const appShell = document.querySelector("#appShell");
+const loginForm = document.querySelector("#loginForm");
+const userNameInput = document.querySelector("#userNameInput");
+const studyFocusInput = document.querySelector("#studyFocusInput");
+const signOutButton = document.querySelector("#signOutButton");
+const sessionAvatar = document.querySelector("#sessionAvatar");
+const sessionName = document.querySelector("#sessionName");
+const sessionFocus = document.querySelector("#sessionFocus");
 const assistantGrid = document.querySelector("#assistantGrid");
 const activeAssistantIcon = document.querySelector("#activeAssistantIcon");
 const chatTitle = document.querySelector("#chat-title");
@@ -19,16 +28,103 @@ const knowledgeStatusMeta = document.querySelector("#knowledgeStatusMeta");
 const knowledgeBreakdown = document.querySelector("#knowledgeBreakdown");
 
 const MAX_MESSAGE_CHARACTERS = 1500;
+const DEMO_SESSION_KEY = "studymate-demo-session";
 
 let assistants = [];
 let selectedAssistant = null;
 let messages = [];
 let isWaitingForReply = false;
+let hasLoadedAppData = false;
+let demoSession = getStoredDemoSession();
 let knowledgeStatus = {
   status: "loading",
   fileCount: 0,
   categories: [],
 };
+
+function getStoredDemoSession() {
+  try {
+    const storedSession = sessionStorage.getItem(DEMO_SESSION_KEY);
+    return storedSession ? JSON.parse(storedSession) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function saveDemoSession(session) {
+  demoSession = session;
+  sessionStorage.setItem(DEMO_SESSION_KEY, JSON.stringify(session));
+}
+
+function clearDemoSession() {
+  demoSession = null;
+  sessionStorage.removeItem(DEMO_SESSION_KEY);
+}
+
+function getUserDisplayName() {
+  return demoSession?.name || "You";
+}
+
+function getUserInitial() {
+  return getUserDisplayName().trim().charAt(0).toUpperCase() || "Y";
+}
+
+function updateSessionUI() {
+  sessionAvatar.textContent = getUserInitial();
+  sessionName.textContent = getUserDisplayName();
+  sessionFocus.textContent = demoSession?.focus || "Study session";
+}
+
+function showWelcomeScreen() {
+  welcomeScreen.classList.remove("is-hidden");
+  appShell.classList.add("is-hidden");
+  userNameInput.focus();
+}
+
+function showAppShell() {
+  updateSessionUI();
+  welcomeScreen.classList.add("is-hidden");
+  appShell.classList.remove("is-hidden");
+  startAppData();
+}
+
+function startAppData() {
+  if (hasLoadedAppData) {
+    return;
+  }
+
+  hasLoadedAppData = true;
+  loadAssistants();
+  loadKnowledgeStatus();
+}
+
+function handleLogin(event) {
+  event.preventDefault();
+
+  const name = userNameInput.value.trim();
+
+  if (!name) {
+    userNameInput.focus();
+    return;
+  }
+
+  saveDemoSession({
+    name,
+    focus: studyFocusInput.value,
+    createdAt: new Date().toISOString(),
+  });
+  showAppShell();
+}
+
+function handleSignOut() {
+  clearDemoSession();
+  messages = [];
+  userNameInput.value = "";
+  studyFocusInput.selectedIndex = 0;
+  renderMessages();
+  renderPromptSuggestions();
+  showWelcomeScreen();
+}
 
 async function loadAssistants() {
   try {
@@ -285,7 +381,7 @@ function createMessageElement(message) {
 
   const avatar = document.createElement("div");
   avatar.className = "message-avatar";
-  avatar.textContent = message.role === "user" ? "M" : message.icon;
+  avatar.textContent = message.icon;
   avatar.setAttribute("aria-hidden", "true");
 
   const content = document.createElement("div");
@@ -295,7 +391,7 @@ function createMessageElement(message) {
   meta.className = "message-meta";
 
   const name = document.createElement("span");
-  name.textContent = message.role === "user" ? "You" : message.name;
+  name.textContent = message.role === "user" ? getUserDisplayName() : message.name;
 
   const time = document.createElement("time");
   time.dateTime = message.createdAt;
@@ -376,8 +472,8 @@ function addMessage(role, text, assistant = selectedAssistant, options = {}) {
     id: createMessageId(),
     role,
     text,
-    name: role === "user" ? "You" : assistant.name,
-    icon: role === "user" ? "M" : assistant.icon,
+    name: role === "user" ? getUserDisplayName() : assistant.name,
+    icon: role === "user" ? getUserInitial() : assistant.icon,
     createdAt: new Date().toISOString(),
     ...options,
   };
@@ -684,5 +780,11 @@ clearChatButton.addEventListener("click", () => {
   messageInput.focus();
 });
 
-loadAssistants();
-loadKnowledgeStatus();
+loginForm.addEventListener("submit", handleLogin);
+signOutButton.addEventListener("click", handleSignOut);
+
+if (demoSession) {
+  showAppShell();
+} else {
+  showWelcomeScreen();
+}
