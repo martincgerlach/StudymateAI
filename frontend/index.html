@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StudyMate AI</title>
+    <link rel="icon" href="assets/studymate-favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="StudyMate assistants">
+        <a class="brand" href="#" aria-label="StudyMate AI home">
+          <img src="assets/studymate-favicon.svg" alt="" class="brand-icon" />
+          <span>
+            <strong>StudyMate AI</strong>
+            <small>AI study workspace</small>
+          </span>
+        </a>
+
+        <div class="sidebar-section">
+          <p class="sidebar-label">Assistants</p>
+          <div class="assistant-list" id="assistantGrid"></div>
+        </div>
+
+        <section class="knowledge-card" aria-labelledby="knowledgeStatusTitle">
+          <p class="sidebar-label">Knowledge Base</p>
+          <div class="knowledge-status" id="knowledgeStatusCard">
+            <span class="status-dot is-loading" id="knowledgeStatusDot" aria-hidden="true"></span>
+            <span>
+              <strong id="knowledgeStatusTitle">Checking knowledge</strong>
+              <small id="knowledgeStatusMeta">Looking for Markdown notes.</small>
+            </span>
+          </div>
+          <ul class="knowledge-breakdown" id="knowledgeBreakdown" aria-label="Connected knowledge categories"></ul>
+        </section>
+
+        <div class="phase-note">
+          <strong>KB-8</strong>
+          <span>Knowledge-aware assistant demo</span>
+        </div>
+      </aside>
+
+      <main class="chat-layout">
+        <header class="chat-topbar">
+          <div class="active-assistant">
+            <span class="active-assistant-icon" id="activeAssistantIcon" aria-hidden="true">SC</span>
+            <div>
+              <p class="eyebrow">Current assistant</p>
+              <h1 id="chat-title">Study Coach</h1>
+              <p id="activeAssistantDescription">
+                Helps you understand topics and plan your study work.
+              </p>
+            </div>
+          </div>
+
+          <div class="assistant-details" aria-label="Assistant details">
+            <div class="detail-group">
+              <p class="detail-label">Best for</p>
+              <div class="tag-list" id="bestForList"></div>
+            </div>
+            <div class="detail-group">
+              <p class="detail-label">Skills</p>
+              <div class="tag-list" id="skillList"></div>
+            </div>
+            <div class="detail-group">
+              <p class="detail-label">Knowledge</p>
+              <div class="tag-list" id="knowledgeList"></div>
+            </div>
+          </div>
+
+          <button class="secondary-button" id="clearChatButton" type="button">
+            New chat
+          </button>
+        </header>
+
+        <section class="chat-panel" aria-labelledby="chat-title">
+          <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
+
+          <div class="prompt-suggestions" id="promptSuggestions" aria-label="Example prompts"></div>
+
+          <form class="composer" id="chatForm">
+            <label for="messageInput" class="visually-hidden">Message</label>
+            <div class="composer-box">
+              <textarea
+                id="messageInput"
+                name="message"
+                rows="1"
+                placeholder="Message StudyMate AI..."
+                autocomplete="off"
+                maxlength="1500"
+              ></textarea>
+              <button class="send-button" id="sendButton" type="submit">Send</button>
+            </div>
+            <p class="composer-help">
+              <span>Demo limit: short messages only. Enter sends. Shift + Enter makes a new line.</span>
+              <span class="character-counter" id="characterCounter">0/1500</span>
+            </p>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>

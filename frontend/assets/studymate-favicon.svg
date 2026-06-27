@@ -1,0 +1,11 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">StudyMate AI favicon</title>
+  <desc id="desc">A square StudyMate AI SM terminal icon.</desc>
+  <rect width="512" height="512" rx="96" fill="#F6F5EF"/>
+  <rect x="76" y="76" width="360" height="360" rx="68" fill="#FFFFFF" stroke="#171717" stroke-width="18"/>
+  <path d="M126 142H178M126 142V194" stroke="#2563EB" stroke-width="24" stroke-linecap="round"/>
+  <path d="M386 142H334M386 142V194" stroke="#2563EB" stroke-width="24" stroke-linecap="round"/>
+  <path d="M126 370V318M126 370H178" stroke="#2563EB" stroke-width="24" stroke-linecap="round"/>
+  <path d="M386 370V318M386 370H334" stroke="#2563EB" stroke-width="24" stroke-linecap="round"/>
+  <text x="256" y="256" text-anchor="middle" dominant-baseline="middle" fill="#171717" font-family="IBM Plex Mono, JetBrains Mono, Courier New, monospace" font-size="104" font-weight="700" letter-spacing="0">SM</text>
+</svg>

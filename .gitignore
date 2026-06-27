@@ -1,0 +1,21 @@
+node_modules/
+.DS_Store
+
+# Local secrets - never upload these to GitHub
+.env
+.env.local
+.env.development
+.env.production
+backend/.env
+backend/.env.local
+backend/.env.development
+backend/.env.production
+
+# Logs
+*.log
+
+# Local source material - keep public repo focused on Markdown summaries
+knowledge/**/*.docx
+knowledge/**/*.key
+knowledge/**/*.pdf
+knowledge/**/*.pptx
