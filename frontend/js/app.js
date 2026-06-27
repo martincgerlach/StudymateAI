@@ -3,6 +3,9 @@ const appShell = document.querySelector("#appShell");
 const loginForm = document.querySelector("#loginForm");
 const userNameInput = document.querySelector("#userNameInput");
 const studyFocusInput = document.querySelector("#studyFocusInput");
+const passwordInput = document.querySelector("#passwordInput");
+const passwordToggle = document.querySelector(".password-toggle");
+const socialLoginButtons = document.querySelectorAll(".social-login-button");
 const signOutButton = document.querySelector("#signOutButton");
 const sessionAvatar = document.querySelector("#sessionAvatar");
 const sessionName = document.querySelector("#sessionName");
@@ -62,7 +65,7 @@ function clearDemoSession() {
 }
 
 function getUserDisplayName() {
-  return demoSession?.name || "You";
+  return demoSession?.name || "Dig";
 }
 
 function getUserInitial() {
@@ -72,7 +75,7 @@ function getUserInitial() {
 function updateSessionUI() {
   sessionAvatar.textContent = getUserInitial();
   sessionName.textContent = getUserDisplayName();
-  sessionFocus.textContent = demoSession?.focus || "Study session";
+  sessionFocus.textContent = demoSession?.focus || "Multimediedesign";
 }
 
 function showWelcomeScreen() {
@@ -101,29 +104,77 @@ function startAppData() {
 function handleLogin(event) {
   event.preventDefault();
 
-  const name = userNameInput.value.trim();
+  const email = userNameInput.value.trim();
 
-  if (!name) {
+  if (!email) {
     userNameInput.focus();
     return;
   }
 
   saveDemoSession({
-    name,
-    focus: studyFocusInput.value,
+    name: getNameFromEmail(email),
+    email,
+    focus: studyFocusInput ? studyFocusInput.value : "Multimediedesign",
     createdAt: new Date().toISOString(),
   });
   showAppShell();
+}
+
+function handleSocialLogin(event) {
+  const provider = event.currentTarget.dataset.provider || "social login";
+
+  saveDemoSession({
+    name: "Demo Studerende",
+    email: `${provider.toLowerCase()}@studymate.demo`,
+    focus: "Multimediedesign",
+    provider,
+    createdAt: new Date().toISOString(),
+  });
+  showAppShell();
+}
+
+function getNameFromEmail(email) {
+  const emailName = email.split("@")[0].trim();
+
+  if (!emailName) {
+    return "Studerende";
+  }
+
+  return emailName
+    .replace(/[._-]+/g, " ")
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 function handleSignOut() {
   clearDemoSession();
   messages = [];
   userNameInput.value = "";
-  studyFocusInput.selectedIndex = 0;
+  if (passwordInput) {
+    passwordInput.value = "";
+  }
+  if (studyFocusInput) {
+    studyFocusInput.selectedIndex = 0;
+  }
   renderMessages();
   renderPromptSuggestions();
   showWelcomeScreen();
+}
+
+function togglePasswordVisibility() {
+  if (!passwordInput || !passwordToggle) {
+    return;
+  }
+
+  const shouldShowPassword = passwordInput.type === "password";
+  passwordInput.type = shouldShowPassword ? "text" : "password";
+  passwordToggle.textContent = shouldShowPassword ? "Skjul" : "Vis";
+  passwordToggle.setAttribute(
+    "aria-label",
+    shouldShowPassword ? "Skjul adgangskode" : "Vis adgangskode"
+  );
 }
 
 async function loadAssistants() {
@@ -782,6 +833,14 @@ clearChatButton.addEventListener("click", () => {
 
 loginForm.addEventListener("submit", handleLogin);
 signOutButton.addEventListener("click", handleSignOut);
+
+if (passwordToggle) {
+  passwordToggle.addEventListener("click", togglePasswordVisibility);
+}
+
+socialLoginButtons.forEach((button) => {
+  button.addEventListener("click", handleSocialLogin);
+});
 
 if (demoSession) {
   showAppShell();

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,72 +9,158 @@
   </head>
   <body>
     <section class="welcome-screen" id="welcomeScreen" aria-labelledby="welcomeTitle">
-      <div class="welcome-content">
-        <div class="welcome-hero">
+      <div class="welcome-card">
+        <div class="welcome-brand-panel">
           <a class="welcome-brand" href="#" aria-label="StudyMate AI">
-            <img src="assets/studymate-logo.svg" alt="StudyMate AI" />
+            <span class="welcome-logo-mark" aria-hidden="true">SM</span>
+            <span>StudyMate <strong>AI</strong></span>
           </a>
-          <p class="eyebrow">AI learning platform for Multimedia Design</p>
-          <h1 id="welcomeTitle">Your study workspace with focused AI assistants.</h1>
-          <p class="welcome-intro">
-            StudyMate AI helps you move from loose notes to clear study actions, project decisions,
-            exam arguments, and code explanations.
-          </p>
-        </div>
 
-        <form class="login-panel" id="loginForm" aria-label="Demo login">
-          <div>
-            <p class="eyebrow">Demo login</p>
-            <h2>Start your session</h2>
+          <div class="welcome-copy">
+            <h1 id="welcomeTitle">
+              Din AI-studiepartner gennem hele <span>Multimediedesign</span>
+            </h1>
             <p>
-              This is mock authentication. It only unlocks the frontend demo and does not create an account.
+              Få hjælp til kodning, design, UX, projekter og eksaminer - alt samlet et sted.
             </p>
           </div>
 
-          <label for="userNameInput">
-            Name
-            <input
-              id="userNameInput"
-              name="userName"
-              type="text"
-              autocomplete="name"
-              placeholder="Martin"
-              maxlength="32"
-              required
-            />
-          </label>
+          <div class="welcome-feature-list" aria-label="StudyMate AI benefits">
+            <article class="welcome-feature">
+              <span class="feature-icon" aria-hidden="true">01</span>
+              <span>
+                <strong>Bygget til Multimediedesign</strong>
+                <small>Designet specifikt til det du lærer på 1., 2., 3. og 4. semester.</small>
+              </span>
+            </article>
+            <article class="welcome-feature">
+              <span class="feature-icon" aria-hidden="true">02</span>
+              <span>
+                <strong>6 specialiserede AI-assistenter</strong>
+                <small>Få præcis hjælp til kodning, design, UX, projekter og meget mere.</small>
+              </span>
+            </article>
+            <article class="welcome-feature">
+              <span class="feature-icon" aria-hidden="true">03</span>
+              <span>
+                <strong>Din personlige vidensbase</strong>
+                <small>AI'en bruger dine noter og projekter, så hjælpen bliver mere relevant.</small>
+              </span>
+            </article>
+          </div>
 
-          <label for="studyFocusInput">
-            Main focus today
-            <select id="studyFocusInput" name="studyFocus">
-              <option value="UX assignment">UX assignment</option>
-              <option value="JavaScript practice">JavaScript practice</option>
-              <option value="Portfolio improvement">Portfolio improvement</option>
-              <option value="Exam preparation">Exam preparation</option>
-            </select>
-          </label>
+          <figure class="student-quote">
+            <blockquote>
+              StudyMate AI gør det nemmere at forstå svære emner og holde styr på mine projekter.
+            </blockquote>
+            <figcaption>
+              <span class="quote-avatar" aria-hidden="true">E</span>
+              Emma, Multimediedesign 2. semester
+            </figcaption>
+          </figure>
+        </div>
 
-          <button class="primary-button" type="submit">Continue to dashboard</button>
-          <p class="login-note">
-            Your API key still stays in the backend. Nothing from this form is sent to OpenAI.
-          </p>
-        </form>
+        <div class="login-side">
+          <div class="language-pill" aria-label="Selected language">
+            <span aria-hidden="true">DK</span>
+            Dansk
+          </div>
 
-        <div class="benefit-grid" aria-label="StudyMate AI benefits">
-          <article class="benefit-card">
-            <strong>Specialized assistants</strong>
-            <p>Choose the right AI role for coding, UX, design critique, exams, or planning.</p>
-          </article>
-          <article class="benefit-card">
-            <strong>Project-aware answers</strong>
-            <p>Use local Knowledge Base context instead of asking a generic chatbot from zero.</p>
-          </article>
-          <article class="benefit-card">
-            <strong>Built for learning</strong>
-            <p>Get explanations that stay practical enough to understand and present yourself.</p>
-          </article>
+          <form class="login-panel" id="loginForm" aria-label="Demo login">
+            <div class="login-heading">
+              <p class="eyebrow">Demo login</p>
+              <h2>Velkommen tilbage</h2>
+              <p>Log ind på din StudyMate AI konto.</p>
+            </div>
+
+            <div class="social-login-list" aria-label="Demo social login options">
+              <button class="social-login-button" type="button" data-provider="Google">
+                <span class="social-icon is-google" aria-hidden="true">G</span>
+                Fortsæt med Google
+              </button>
+              <button class="social-login-button" type="button" data-provider="Microsoft">
+                <span class="social-icon is-microsoft" aria-hidden="true">M</span>
+                Fortsæt med Microsoft
+              </button>
+              <button class="social-login-button" type="button" data-provider="Apple">
+                <span class="social-icon is-apple" aria-hidden="true">A</span>
+                Fortsæt med Apple
+              </button>
+            </div>
+
+            <div class="login-divider">
+              <span>eller</span>
+            </div>
+
+            <label for="userNameInput">
+              E-mail
+              <input
+                id="userNameInput"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="din@email.com"
+                maxlength="64"
+                required
+              />
+            </label>
+
+            <label for="passwordInput">
+              Adgangskode
+              <span class="password-field">
+                <input
+                  id="passwordInput"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  placeholder="********"
+                  maxlength="64"
+                  required
+                />
+                <button class="password-toggle" type="button" aria-label="Vis adgangskode">Vis</button>
+              </span>
+            </label>
+
+            <div class="login-row">
+              <label class="remember-option" for="rememberInput">
+                <input id="rememberInput" name="remember" type="checkbox" />
+                Husk mig
+              </label>
+              <a href="#">Glemt adgangskode?</a>
+            </div>
+
+            <button class="primary-button" type="submit">
+              Log ind
+              <span aria-hidden="true">-></span>
+            </button>
+
+            <p class="signup-note">
+              Har du ikke en konto?
+              <a href="#">Opret konto</a>
+            </p>
+          </form>
         </div>
       </div>
+
+      <div class="welcome-trust-row" aria-label="StudyMate AI trust points">
+        <article>
+          <span aria-hidden="true">01</span>
+          <strong>Dine data er sikre</strong>
+          <p>Din API key bliver i backend.</p>
+        </article>
+        <article>
+          <span aria-hidden="true">02</span>
+          <strong>Til studerende</strong>
+          <p>Kun for Multimediedesign studerende.</p>
+        </article>
+        <article>
+          <span aria-hidden="true">03</span>
+          <strong>Skabt med omtanke</strong>
+          <p>Bygget til læring, ikke bare hurtige svar.</p>
+        </article>
+      </div>
+
+      <p class="welcome-footer">© 2026 StudyMate AI. Alle rettigheder forbeholdes.</p>
     </section>
 
     <div class="app-shell is-hidden" id="appShell">
@@ -91,9 +177,9 @@
           <span class="session-avatar" id="sessionAvatar" aria-hidden="true">M</span>
           <span>
             <strong id="sessionName">Martin</strong>
-            <small id="sessionFocus">UX assignment</small>
+            <small id="sessionFocus">Multimediedesign</small>
           </span>
-          <button class="sign-out-button" id="signOutButton" type="button">Sign out</button>
+          <button class="sign-out-button" id="signOutButton" type="button">Log ud</button>
         </div>
 
         <div class="sidebar-section">
@@ -148,7 +234,7 @@
           </div>
 
           <button class="secondary-button" id="clearChatButton" type="button">
-            New chat
+            Ny chat
           </button>
         </header>
 
