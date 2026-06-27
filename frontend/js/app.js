@@ -1,6 +1,13 @@
 const welcomeScreen = document.querySelector("#welcomeScreen");
 const appShell = document.querySelector("#appShell");
 const loginForm = document.querySelector("#loginForm");
+const authEyebrow = document.querySelector("#authEyebrow");
+const authTitle = document.querySelector("#authTitle");
+const authDescription = document.querySelector("#authDescription");
+const authSubmitText = document.querySelector("#authSubmitText");
+const authToggleText = document.querySelector("#authToggleText");
+const authModeToggle = document.querySelector("#authModeToggle");
+const loginFeedback = document.querySelector("#loginFeedback");
 const userNameInput = document.querySelector("#userNameInput");
 const studyFocusInput = document.querySelector("#studyFocusInput");
 const passwordInput = document.querySelector("#passwordInput");
@@ -24,10 +31,13 @@ const newChatButton = document.querySelector("#newChatButton");
 const newChatDialog = document.querySelector("#newChatDialog");
 const newChatCloseButton = document.querySelector("#newChatCloseButton");
 const newChatAssistantList = document.querySelector("#newChatAssistantList");
+const tutorialDialog = document.querySelector("#tutorialDialog");
+const tutorialDoneButton = document.querySelector("#tutorialDoneButton");
 const characterCounter = document.querySelector("#characterCounter");
 
 const MAX_MESSAGE_CHARACTERS = 1500;
 const DEMO_SESSION_KEY = "studymate-demo-session";
+const DEMO_ACCOUNTS_KEY = "studymate-demo-accounts";
 
 let assistants = [];
 let selectedAssistant = null;
@@ -35,6 +45,7 @@ let messages = [];
 let isWaitingForReply = false;
 let hasLoadedAppData = false;
 let demoSession = getStoredDemoSession();
+let authMode = "login";
 
 function getStoredDemoSession() {
   try {
@@ -53,6 +64,89 @@ function saveDemoSession(session) {
 function clearDemoSession() {
   demoSession = null;
   sessionStorage.removeItem(DEMO_SESSION_KEY);
+}
+
+function getStoredDemoAccounts() {
+  try {
+    const storedAccounts = localStorage.getItem(DEMO_ACCOUNTS_KEY);
+    return storedAccounts ? JSON.parse(storedAccounts) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveDemoAccounts(accounts) {
+  localStorage.setItem(DEMO_ACCOUNTS_KEY, JSON.stringify(accounts));
+}
+
+function normalizeEmail(email) {
+  return email.trim().toLowerCase();
+}
+
+function findDemoAccount(email) {
+  return getStoredDemoAccounts().find((account) => account.email === normalizeEmail(email));
+}
+
+function updateDemoAccount(email, updates) {
+  const accounts = getStoredDemoAccounts();
+  const accountIndex = accounts.findIndex((account) => account.email === normalizeEmail(email));
+
+  if (accountIndex === -1) {
+    return;
+  }
+
+  accounts[accountIndex] = {
+    ...accounts[accountIndex],
+    ...updates,
+  };
+  saveDemoAccounts(accounts);
+}
+
+async function hashPassword(password) {
+  if (!window.crypto || !window.crypto.subtle) {
+    return `demo:${password}`;
+  }
+
+  const encodedPassword = new TextEncoder().encode(password);
+  const hashBuffer = await window.crypto.subtle.digest("SHA-256", encodedPassword);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function setAuthMode(nextMode) {
+  authMode = nextMode;
+  loginForm.dataset.mode = authMode;
+  clearLoginFeedback();
+
+  if (authMode === "signup") {
+    authEyebrow.textContent = "Opret konto";
+    authTitle.textContent = "Opret din konto";
+    authDescription.textContent = "Lav en lokal demo-konto før du bruger StudyMate AI.";
+    authSubmitText.textContent = "Opret konto";
+    authToggleText.textContent = "Har du allerede en konto?";
+    authModeToggle.textContent = "Log ind";
+    passwordInput.autocomplete = "new-password";
+    return;
+  }
+
+  authEyebrow.textContent = "Login";
+  authTitle.textContent = "Velkommen tilbage";
+  authDescription.textContent = "Log ind med en konto du allerede har oprettet.";
+  authSubmitText.textContent = "Log ind";
+  authToggleText.textContent = "Har du ikke en konto?";
+  authModeToggle.textContent = "Opret konto";
+  passwordInput.autocomplete = "current-password";
+}
+
+function clearLoginFeedback() {
+  loginFeedback.textContent = "";
+  loginFeedback.className = "login-feedback";
+}
+
+function setLoginFeedback(message, type = "error") {
+  loginFeedback.textContent = message;
+  loginFeedback.className = `login-feedback is-${type}`;
 }
 
 function getUserDisplayName() {
@@ -91,36 +185,122 @@ function startAppData() {
   loadAssistants();
 }
 
-function handleLogin(event) {
+async function handleLogin(event) {
   event.preventDefault();
 
-  const email = userNameInput.value.trim();
+  const email = normalizeEmail(userNameInput.value);
+  const password = passwordInput ? passwordInput.value : "";
 
   if (!email) {
     userNameInput.focus();
     return;
   }
 
-  saveDemoSession({
-    name: getNameFromEmail(email),
+  if (!password || password.length < 6) {
+    setLoginFeedback("Adgangskoden skal være mindst 6 tegn.");
+    passwordInput.focus();
+    return;
+  }
+
+  if (authMode === "signup") {
+    await createLocalDemoAccount(email, password);
+    return;
+  }
+
+  await signInWithLocalDemoAccount(email, password);
+}
+
+async function createLocalDemoAccount(email, password) {
+  const existingAccount = findDemoAccount(email);
+
+  if (existingAccount) {
+    setLoginFeedback("Der findes allerede en konto med den e-mail. Log ind i stedet.");
+    return;
+  }
+
+  const account = {
     email,
+    name: getNameFromEmail(email),
     focus: studyFocusInput ? studyFocusInput.value : "Multimediedesign",
+    passwordHash: await hashPassword(password),
+    provider: "email",
+    createdAt: new Date().toISOString(),
+    hasSeenTutorial: false,
+  };
+
+  const accounts = getStoredDemoAccounts();
+  accounts.push(account);
+  saveDemoAccounts(accounts);
+  startSessionForAccount(account);
+  showAppShell();
+  openTutorialDialogSoon();
+}
+
+async function signInWithLocalDemoAccount(email, password) {
+  const account = findDemoAccount(email);
+
+  if (!account || account.provider !== "email") {
+    setLoginFeedback("Kontoen findes ikke. Opret en konto først.");
+    return;
+  }
+
+  const passwordHash = await hashPassword(password);
+
+  if (account.passwordHash !== passwordHash) {
+    setLoginFeedback("Forkert adgangskode.");
+    passwordInput.focus();
+    return;
+  }
+
+  startSessionForAccount(account);
+  showAppShell();
+
+  if (!account.hasSeenTutorial) {
+    openTutorialDialogSoon();
+  }
+}
+
+function startSessionForAccount(account) {
+  saveDemoSession({
+    name: account.name,
+    email: account.email,
+    focus: account.focus || "Multimediedesign",
+    provider: account.provider,
     createdAt: new Date().toISOString(),
   });
-  showAppShell();
 }
 
 function handleSocialLogin(event) {
   const provider = event.currentTarget.dataset.provider || "social login";
+  const email = `${provider.toLowerCase()}@studymate.demo`;
+  let account = findDemoAccount(email);
+  const isNewAccount = !account;
 
-  saveDemoSession({
-    name: "Demo Studerende",
-    email: `${provider.toLowerCase()}@studymate.demo`,
-    focus: "Multimediedesign",
+  if (!account) {
+    account = {
+      email,
+      name: "Demo Studerende",
+      focus: "Multimediedesign",
+      passwordHash: "",
+      provider,
+      createdAt: new Date().toISOString(),
+      hasSeenTutorial: false,
+    };
+
+    const accounts = getStoredDemoAccounts();
+    accounts.push(account);
+    saveDemoAccounts(accounts);
+  }
+
+  startSessionForAccount({
+    ...account,
     provider,
-    createdAt: new Date().toISOString(),
   });
   showAppShell();
+
+  if (isNewAccount || !account.hasSeenTutorial) {
+    openTutorialDialogSoon();
+  }
 }
 
 function getNameFromEmail(email) {
@@ -148,6 +328,7 @@ function handleSignOut() {
   if (studyFocusInput) {
     studyFocusInput.selectedIndex = 0;
   }
+  setAuthMode("login");
   renderMessages();
   renderPromptSuggestions();
   showWelcomeScreen();
@@ -713,6 +894,42 @@ function closeNewChatDialog() {
   }
 }
 
+function openTutorialDialogSoon() {
+  window.setTimeout(openTutorialDialog, 120);
+}
+
+function openTutorialDialog() {
+  if (!tutorialDialog) {
+    return;
+  }
+
+  if (typeof tutorialDialog.showModal === "function") {
+    tutorialDialog.showModal();
+  } else {
+    tutorialDialog.setAttribute("open", "");
+  }
+
+  tutorialDoneButton?.focus();
+}
+
+function closeTutorialDialog() {
+  if (!tutorialDialog) {
+    return;
+  }
+
+  updateDemoAccount(demoSession?.email || "", {
+    hasSeenTutorial: true,
+  });
+
+  if (typeof tutorialDialog.close === "function") {
+    tutorialDialog.close();
+  } else {
+    tutorialDialog.removeAttribute("open");
+  }
+
+  messageInput.focus();
+}
+
 function setWaitingState(isWaiting) {
   isWaitingForReply = isWaiting;
   messageInput.disabled = isWaiting;
@@ -786,7 +1003,11 @@ newChatDialog.addEventListener("click", (event) => {
 });
 
 loginForm.addEventListener("submit", handleLogin);
+authModeToggle.addEventListener("click", () => {
+  setAuthMode(authMode === "login" ? "signup" : "login");
+});
 signOutButton.addEventListener("click", handleSignOut);
+tutorialDoneButton.addEventListener("click", closeTutorialDialog);
 
 if (passwordToggle) {
   passwordToggle.addEventListener("click", togglePasswordVisibility);

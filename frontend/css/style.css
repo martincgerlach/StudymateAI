@@ -73,7 +73,7 @@ button:disabled {
 
 .welcome-screen {
   min-height: 100vh;
-  padding: var(--space-4);
+  padding: var(--space-3);
   background:
     radial-gradient(circle at 18% 8%, rgba(109, 76, 255, 0.16), transparent 26rem),
     radial-gradient(circle at 100% 0%, rgba(167, 139, 250, 0.16), transparent 28rem),
@@ -82,7 +82,7 @@ button:disabled {
 
 .welcome-card {
   display: grid;
-  width: min(1180px, 100%);
+  width: min(1500px, 100%);
   margin: 0 auto;
   overflow: hidden;
   border: 1px solid rgba(223, 228, 242, 0.9);
@@ -253,7 +253,8 @@ button:disabled {
 
 .login-panel p,
 .login-note,
-.signup-note {
+.signup-note,
+.login-feedback {
   color: var(--color-muted);
 }
 
@@ -387,31 +388,13 @@ button:disabled {
 }
 
 .social-icon {
-  display: grid;
-  place-items: center;
   width: 28px;
   height: 28px;
-  border-radius: 8px;
-  font-weight: 900;
-}
-
-.social-icon.is-google {
-  color: #4285f4;
-}
-
-.social-icon.is-microsoft {
-  background:
-    linear-gradient(90deg, #f25022 0 50%, #7fba00 50%),
-    linear-gradient(90deg, #00a4ef 0 50%, #ffb900 50%);
-  background-position: top, bottom;
-  background-repeat: no-repeat;
-  background-size: 100% 50%;
-  color: transparent;
+  flex: 0 0 auto;
 }
 
 .social-icon.is-apple {
-  background: var(--color-text);
-  color: #ffffff;
+  color: #11152a;
 }
 
 .login-divider {
@@ -489,7 +472,7 @@ button:disabled {
 }
 
 .login-row a,
-.signup-note a {
+.text-button {
   color: var(--color-primary-dark);
   font-weight: 900;
   text-decoration: none;
@@ -497,9 +480,37 @@ button:disabled {
 
 .login-row a:hover,
 .login-row a:focus-visible,
-.signup-note a:hover,
-.signup-note a:focus-visible {
+.text-button:hover,
+.text-button:focus-visible {
   text-decoration: underline;
+}
+
+.login-panel[data-mode="signup"] .login-row {
+  display: none;
+}
+
+.login-feedback {
+  min-height: 22px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.login-feedback:empty {
+  display: none;
+}
+
+.login-feedback.is-error {
+  color: var(--color-error);
+}
+
+.login-feedback.is-success {
+  color: var(--color-success);
+}
+
+.text-button {
+  padding: 0;
+  background: transparent;
 }
 
 .primary-button {
@@ -527,46 +538,12 @@ button:disabled {
   text-align: center;
 }
 
-.welcome-trust-row {
-  display: grid;
-  gap: var(--space-3);
-  width: min(980px, 100%);
-  margin: var(--space-5) auto 0;
-}
-
-.welcome-trust-row article {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--space-2) var(--space-3);
-  align-items: start;
-}
-
-.welcome-trust-row span {
-  display: grid;
-  grid-row: span 2;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid rgba(109, 76, 255, 0.22);
-  border-radius: 12px;
-  color: var(--color-primary);
-  font-family: "IBM Plex Mono", "JetBrains Mono", "Courier New", monospace;
-  font-size: 0.76rem;
-  font-weight: 900;
-}
-
-.welcome-trust-row strong,
-.welcome-trust-row p {
-  margin: 0;
-}
-
-.welcome-trust-row p,
 .welcome-footer {
   color: var(--color-muted);
 }
 
 .welcome-footer {
-  margin: var(--space-5) 0 0;
+  margin: var(--space-4) 0 0;
   text-align: center;
   font-size: 0.9rem;
 }
@@ -1264,6 +1241,92 @@ button:disabled {
   color: var(--color-text);
 }
 
+.tutorial-dialog {
+  width: min(760px, calc(100vw - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  color: var(--color-text);
+}
+
+.tutorial-dialog::backdrop {
+  background: rgba(11, 16, 33, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.tutorial-panel {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(109, 76, 255, 0.11), transparent 18rem),
+    var(--color-surface);
+  box-shadow: var(--shadow-strong);
+}
+
+.tutorial-header {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.tutorial-header h2,
+.tutorial-header p,
+.tutorial-steps h3,
+.tutorial-steps p {
+  margin: 0;
+}
+
+.tutorial-header h2 {
+  font-size: clamp(1.7rem, 4vw, 2.45rem);
+  line-height: 1.1;
+}
+
+.tutorial-header p,
+.tutorial-steps p {
+  color: var(--color-muted);
+}
+
+.tutorial-steps {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.tutorial-steps article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-1) var(--space-3);
+  align-items: start;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: rgba(247, 248, 255, 0.72);
+}
+
+.tutorial-steps span {
+  display: grid;
+  grid-row: span 2;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--color-purple-soft);
+  color: var(--color-primary-dark);
+  font-family: "IBM Plex Mono", "JetBrains Mono", "Courier New", monospace;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.tutorial-steps h3 {
+  font-size: 1rem;
+}
+
+.tutorial-panel .primary-button {
+  width: 100%;
+}
+
 .new-chat-dialog::backdrop {
   background: rgba(11, 16, 33, 0.46);
   backdrop-filter: blur(8px);
@@ -1427,10 +1490,6 @@ button:disabled {
     right: var(--space-5);
   }
 
-  .welcome-trust-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .welcome-feature-list {
     margin-top: var(--space-3);
   }
@@ -1446,10 +1505,6 @@ button:disabled {
 
   .welcome-feature-list {
     gap: var(--space-4);
-  }
-
-  .welcome-trust-row article {
-    grid-template-columns: auto 1fr;
   }
 
   .app-shell {
