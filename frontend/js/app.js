@@ -15,8 +15,6 @@ const activeAssistantIcon = document.querySelector("#activeAssistantIcon");
 const chatTitle = document.querySelector("#chat-title");
 const activeAssistantDescription = document.querySelector("#activeAssistantDescription");
 const bestForList = document.querySelector("#bestForList");
-const skillList = document.querySelector("#skillList");
-const knowledgeList = document.querySelector("#knowledgeList");
 const chatMessages = document.querySelector("#chatMessages");
 const promptSuggestions = document.querySelector("#promptSuggestions");
 const chatForm = document.querySelector("#chatForm");
@@ -242,7 +240,6 @@ function renderAssistants() {
       <span class="assistant-card-content">
         <h2>${assistant.name}</h2>
         <p>${assistant.shortDescription || assistant.description}</p>
-        ${createAssistantKnowledgeBadge()}
       </span>
     `;
 
@@ -269,38 +266,6 @@ function updateActiveAssistant() {
     selectedAssistant.shortDescription || selectedAssistant.description;
 
   renderTags(bestForList, selectedAssistant.bestFor || []);
-  renderTags(
-    skillList,
-    (selectedAssistant.connectedSkills || []).map((skill) => skill.name)
-  );
-  renderTags(knowledgeList, getAssistantKnowledgeTags());
-}
-
-function createAssistantKnowledgeBadge() {
-  if (knowledgeStatus.status !== "ready") {
-    return "";
-  }
-
-  return `<small class="assistant-knowledge-badge">Knowledge-aware</small>`;
-}
-
-function getAssistantKnowledgeTags() {
-  if (knowledgeStatus.status === "ready") {
-    return [
-      `${knowledgeStatus.fileCount} knowledge files`,
-      ...getVisibleKnowledgeCategories().map((category) => category.label),
-    ];
-  }
-
-  if (knowledgeStatus.status === "empty") {
-    return ["No knowledge files yet"];
-  }
-
-  if (knowledgeStatus.status === "error") {
-    return ["Knowledge status unavailable"];
-  }
-
-  return ["Checking knowledge"];
 }
 
 function updateKnowledgeStatus() {
