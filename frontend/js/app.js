@@ -22,11 +22,6 @@ const messageInput = document.querySelector("#messageInput");
 const sendButton = document.querySelector("#sendButton");
 const clearChatButton = document.querySelector("#clearChatButton");
 const characterCounter = document.querySelector("#characterCounter");
-const knowledgeStatusCard = document.querySelector("#knowledgeStatusCard");
-const knowledgeStatusDot = document.querySelector("#knowledgeStatusDot");
-const knowledgeStatusTitle = document.querySelector("#knowledgeStatusTitle");
-const knowledgeStatusMeta = document.querySelector("#knowledgeStatusMeta");
-const knowledgeBreakdown = document.querySelector("#knowledgeBreakdown");
 
 const MAX_MESSAGE_CHARACTERS = 1500;
 const DEMO_SESSION_KEY = "studymate-demo-session";
@@ -37,11 +32,6 @@ let messages = [];
 let isWaitingForReply = false;
 let hasLoadedAppData = false;
 let demoSession = getStoredDemoSession();
-let knowledgeStatus = {
-  status: "loading",
-  fileCount: 0,
-  categories: [],
-};
 
 function getStoredDemoSession() {
   try {
@@ -96,7 +86,6 @@ function startAppData() {
 
   hasLoadedAppData = true;
   loadAssistants();
-  loadKnowledgeStatus();
 }
 
 function handleLogin(event) {
@@ -200,27 +189,6 @@ async function loadAssistants() {
   }
 }
 
-async function loadKnowledgeStatus() {
-  try {
-    const response = await fetch("/api/knowledge/status");
-
-    if (!response.ok) {
-      throw new Error("Could not load Knowledge Base status");
-    }
-
-    knowledgeStatus = await response.json();
-  } catch (error) {
-    knowledgeStatus = {
-      status: "error",
-      fileCount: 0,
-    };
-  }
-
-  updateKnowledgeStatus();
-  updateActiveAssistant();
-  renderAssistants();
-}
-
 function renderAssistants() {
   assistantGrid.innerHTML = "";
 
@@ -266,65 +234,6 @@ function updateActiveAssistant() {
     selectedAssistant.shortDescription || selectedAssistant.description;
 
   renderTags(bestForList, selectedAssistant.bestFor || []);
-}
-
-function updateKnowledgeStatus() {
-  if (!knowledgeStatusCard) {
-    return;
-  }
-
-  knowledgeStatusDot.className = `status-dot is-${knowledgeStatus.status}`;
-  renderKnowledgeBreakdown();
-
-  if (knowledgeStatus.status === "ready") {
-    knowledgeStatusTitle.textContent = "Knowledge ready";
-    knowledgeStatusMeta.textContent = `${knowledgeStatus.fileCount} Markdown files connected.`;
-    return;
-  }
-
-  if (knowledgeStatus.status === "empty") {
-    knowledgeStatusTitle.textContent = "No knowledge yet";
-    knowledgeStatusMeta.textContent = "Add Markdown files to the knowledge folder.";
-    return;
-  }
-
-  if (knowledgeStatus.status === "error") {
-    knowledgeStatusTitle.textContent = "Knowledge unavailable";
-    knowledgeStatusMeta.textContent = "The backend status endpoint did not respond.";
-    return;
-  }
-
-  knowledgeStatusTitle.textContent = "Checking knowledge";
-  knowledgeStatusMeta.textContent = "Looking for Markdown notes.";
-}
-
-function getVisibleKnowledgeCategories() {
-  return (knowledgeStatus.categories || []).filter((category) => category.count > 0);
-}
-
-function renderKnowledgeBreakdown() {
-  if (!knowledgeBreakdown) {
-    return;
-  }
-
-  knowledgeBreakdown.innerHTML = "";
-
-  if (knowledgeStatus.status !== "ready") {
-    knowledgeBreakdown.classList.add("is-hidden");
-    return;
-  }
-
-  const categories = getVisibleKnowledgeCategories();
-  knowledgeBreakdown.classList.toggle("is-hidden", categories.length === 0);
-
-  categories.forEach((category) => {
-    const item = document.createElement("li");
-    item.innerHTML = `
-      <span>${category.label}</span>
-      <strong>${category.count}</strong>
-    `;
-    knowledgeBreakdown.appendChild(item);
-  });
 }
 
 function renderTags(container, items) {
