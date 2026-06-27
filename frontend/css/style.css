@@ -574,7 +574,7 @@ button:disabled {
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
   padding: var(--space-4);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   background:
@@ -630,42 +630,92 @@ button:disabled {
   color: #c5cce3;
 }
 
+.new-chat-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  width: 100%;
+  padding: 0 13px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: rgba(244, 246, 255, 0.94);
+  color: #252a35;
+  font-size: 1rem;
+  font-weight: 750;
+  text-align: left;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+.new-chat-button svg {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.new-chat-button:hover,
+.new-chat-button:focus-visible {
+  background: #ffffff;
+  outline: 3px solid rgba(167, 139, 250, 0.28);
+}
+
 .session-card {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--space-2);
   align-items: center;
-  padding: var(--space-3);
+  margin-top: auto;
+  padding: 10px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.session-card > span:not(.session-avatar) {
+  min-width: 0;
+}
+
+.session-card strong,
+.session-card small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .session-avatar {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   border-radius: var(--radius-small);
   background: linear-gradient(145deg, var(--color-primary), var(--color-secondary));
   color: #ffffff;
   font-family: "IBM Plex Mono", "JetBrains Mono", "Courier New", monospace;
+  font-size: 0.78rem;
   font-weight: 800;
 }
 
 .sign-out-button {
-  grid-column: 1 / -1;
-  min-height: 34px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-small);
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
+  min-height: 32px;
+  padding: 0 var(--space-2);
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #c5cce3;
   font-size: 0.82rem;
   font-weight: 800;
 }
 
 .sign-out-button:hover,
 .sign-out-button:focus-visible {
-  border-color: var(--color-secondary);
+  border-color: rgba(167, 139, 250, 0.36);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
   outline: 3px solid rgba(167, 139, 250, 0.22);
 }
 
@@ -841,23 +891,6 @@ button:disabled {
   color: var(--color-primary-dark);
   font-size: 0.78rem;
   font-weight: 700;
-}
-
-.secondary-button {
-  justify-self: start;
-  min-height: 42px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-small);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font-weight: 700;
-}
-
-.secondary-button:hover,
-.secondary-button:focus-visible {
-  border-color: var(--color-primary);
-  outline: 3px solid var(--focus-ring);
 }
 
 .chat-panel {
@@ -1222,6 +1255,112 @@ button:disabled {
   color: var(--color-warning);
 }
 
+.new-chat-dialog {
+  width: min(620px, calc(100vw - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: transparent;
+  color: var(--color-text);
+}
+
+.new-chat-dialog::backdrop {
+  background: rgba(11, 16, 33, 0.46);
+  backdrop-filter: blur(8px);
+}
+
+.new-chat-dialog-panel {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-strong);
+}
+
+.new-chat-dialog-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.new-chat-dialog h2,
+.new-chat-dialog p {
+  margin: 0;
+}
+
+.new-chat-dialog h2 {
+  margin-top: var(--space-1);
+  font-size: clamp(1.45rem, 4vw, 2rem);
+  line-height: 1.1;
+}
+
+.new-chat-dialog-header p:last-child {
+  margin-top: var(--space-1);
+  color: var(--color-muted);
+}
+
+.dialog-close-button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.dialog-close-button:hover,
+.dialog-close-button:focus-visible {
+  border-color: var(--color-primary);
+  outline: 3px solid var(--focus-ring);
+}
+
+.new-chat-agent-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.new-chat-agent-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: center;
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: left;
+}
+
+.new-chat-agent-card strong,
+.new-chat-agent-card small {
+  display: block;
+}
+
+.new-chat-agent-card small {
+  margin-top: 2px;
+  color: var(--color-muted);
+}
+
+.new-chat-agent-card:hover,
+.new-chat-agent-card:focus-visible,
+.new-chat-agent-card.is-active {
+  border-color: var(--color-primary);
+  background: var(--color-surface-soft);
+}
+
+.new-chat-agent-card:focus-visible {
+  outline: 3px solid var(--focus-ring);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -1316,23 +1455,42 @@ button:disabled {
   .app-shell {
     display: grid;
     grid-template-columns: 300px minmax(0, 1fr);
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .sidebar {
     position: sticky;
     top: 0;
+    height: 100vh;
     min-height: 100vh;
+    overflow: hidden;
     border-right: 1px solid rgba(255, 255, 255, 0.08);
     border-bottom: 0;
   }
 
-  .chat-topbar {
-    grid-template-columns: minmax(260px, 1fr) minmax(280px, 420px) auto;
-    padding: var(--space-4) var(--space-5);
+  .sidebar-section {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
   }
 
-  .secondary-button {
-    justify-self: end;
+  .assistant-list {
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+
+  .chat-layout {
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .chat-topbar {
+    grid-template-columns: minmax(260px, 1fr) minmax(280px, 420px);
+    padding: var(--space-4) var(--space-5);
   }
 
   .prompt-suggestions {

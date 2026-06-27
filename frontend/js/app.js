@@ -20,7 +20,10 @@ const promptSuggestions = document.querySelector("#promptSuggestions");
 const chatForm = document.querySelector("#chatForm");
 const messageInput = document.querySelector("#messageInput");
 const sendButton = document.querySelector("#sendButton");
-const clearChatButton = document.querySelector("#clearChatButton");
+const newChatButton = document.querySelector("#newChatButton");
+const newChatDialog = document.querySelector("#newChatDialog");
+const newChatCloseButton = document.querySelector("#newChatCloseButton");
+const newChatAssistantList = document.querySelector("#newChatAssistantList");
 const characterCounter = document.querySelector("#characterCounter");
 
 const MAX_MESSAGE_CHARACTERS = 1500;
@@ -177,6 +180,7 @@ async function loadAssistants() {
     selectedAssistant = assistants[0];
 
     renderAssistants();
+    renderNewChatAssistants();
     updateActiveAssistant();
     renderPromptSuggestions();
     renderMessages();
@@ -212,15 +216,60 @@ function renderAssistants() {
     `;
 
     button.addEventListener("click", () => {
-      selectedAssistant = assistant;
-      updateActiveAssistant();
-      renderAssistants();
-      renderPromptSuggestions();
-      messageInput.focus();
+      selectAssistant(assistant);
     });
 
     assistantGrid.appendChild(button);
   });
+}
+
+function renderNewChatAssistants() {
+  if (!newChatAssistantList) {
+    return;
+  }
+
+  newChatAssistantList.innerHTML = "";
+
+  assistants.forEach((assistant) => {
+    const button = document.createElement("button");
+    button.className = "new-chat-agent-card";
+    button.type = "button";
+    button.dataset.assistantId = assistant.id;
+
+    if (assistant.id === selectedAssistant?.id) {
+      button.classList.add("is-active");
+    }
+
+    button.innerHTML = `
+      <span class="assistant-icon" aria-hidden="true">${assistant.icon}</span>
+      <span>
+        <strong>${assistant.name}</strong>
+        <small>${assistant.shortDescription || assistant.description}</small>
+      </span>
+    `;
+
+    button.addEventListener("click", () => {
+      closeNewChatDialog();
+      selectAssistant(assistant, { startNewChat: true });
+    });
+
+    newChatAssistantList.appendChild(button);
+  });
+}
+
+function selectAssistant(assistant, options = {}) {
+  selectedAssistant = assistant;
+
+  if (options.startNewChat) {
+    messages = [];
+  }
+
+  updateActiveAssistant();
+  renderAssistants();
+  renderPromptSuggestions();
+  renderMessages();
+  updateSendButton();
+  messageInput.focus();
 }
 
 function updateActiveAssistant() {
@@ -635,6 +684,35 @@ function retryMessage(message, assistantId) {
   handleUserMessage(message, assistant);
 }
 
+function openNewChatDialog() {
+  if (!newChatDialog || isWaitingForReply) {
+    return;
+  }
+
+  renderNewChatAssistants();
+
+  if (typeof newChatDialog.showModal === "function") {
+    newChatDialog.showModal();
+  } else {
+    newChatDialog.setAttribute("open", "");
+  }
+
+  const firstAgentButton = newChatDialog.querySelector(".new-chat-agent-card");
+  firstAgentButton?.focus();
+}
+
+function closeNewChatDialog() {
+  if (!newChatDialog) {
+    return;
+  }
+
+  if (typeof newChatDialog.close === "function") {
+    newChatDialog.close();
+  } else {
+    newChatDialog.removeAttribute("open");
+  }
+}
+
 function setWaitingState(isWaiting) {
   isWaitingForReply = isWaiting;
   messageInput.disabled = isWaiting;
@@ -698,11 +776,13 @@ messageInput.addEventListener("keydown", (event) => {
   }
 });
 
-clearChatButton.addEventListener("click", () => {
-  messages = [];
-  renderMessages();
-  renderPromptSuggestions();
-  messageInput.focus();
+newChatButton.addEventListener("click", openNewChatDialog);
+newChatCloseButton.addEventListener("click", closeNewChatDialog);
+
+newChatDialog.addEventListener("click", (event) => {
+  if (event.target === newChatDialog) {
+    closeNewChatDialog();
+  }
 });
 
 loginForm.addEventListener("submit", handleLogin);
