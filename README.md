@@ -1,6 +1,6 @@
 # StudyMate AI
 
-StudyMate AI is a vanilla HTML, CSS, JavaScript, Node.js, and Express demo project.
+StudyMate AI is a vanilla HTML, CSS, JavaScript, Node.js, Express, and Cloudflare Pages demo project.
 
 The goal is to show how a study platform can use specialized AI assistants instead of one generic chatbot. Each assistant has its own role, skill stack, and access to a local Knowledge Base.
 
@@ -43,6 +43,7 @@ The backend builds the AI context before sending the message to OpenAI.
 - Vanilla JavaScript
 - Node.js
 - Express
+- Cloudflare Pages Functions
 - OpenAI API
 - local Markdown Knowledge Base
 
@@ -65,6 +66,12 @@ StudymateAI/
 │   │   └── promptBuilder.js
 │   └── utils/
 │       └── knowledgeLoader.js
+├── functions/
+│   └── api/
+│       ├── assistants.js
+│       └── chat.js
+├── cloudflare/
+│   └── studymate-api.js
 ├── knowledge/
 │   ├── README.md
 │   ├── source-map.md
@@ -106,6 +113,35 @@ npm start
 http://localhost:3000
 ```
 
+## Cloudflare Deployment
+
+Cloudflare is the recommended public demo host because it can serve the frontend and run the AI API without exposing the OpenAI API key.
+
+Recommended Cloudflare Pages settings:
+
+- Repository: `martincgerlach/StudymateAI`
+- Production branch: `main`
+- Build command: leave empty
+- Build output directory: `frontend`
+- Functions directory: `functions`
+- Compatibility date: `2026-06-28`
+
+Set these environment variables in Cloudflare Pages, not in GitHub:
+
+```text
+OPENAI_API_KEY=your_cloudflare_secret
+OPENAI_MODEL=gpt-4.1-mini
+OPENAI_MAX_OUTPUT_TOKENS=450
+MAX_MESSAGE_CHARACTERS=1500
+CHAT_RATE_LIMIT_WINDOW_MS=600000
+CHAT_RATE_LIMIT_MAX_REQUESTS=8
+ALLOWED_ORIGINS=
+```
+
+`frontend/_routes.json` makes sure Cloudflare Functions only run for `/api/*`. The normal HTML, CSS, JavaScript, and SVG files are served as static files.
+
+GitHub Pages can still show a static fallback demo, but it cannot run the real AI backend.
+
 ## Useful Development Endpoints
 
 - `GET /api/assistants`
@@ -122,6 +158,7 @@ The debug endpoints only run when debug routes are enabled. Keep `ENABLE_DEBUG_R
 - The OpenAI API key is only used in the backend.
 - The frontend never receives the API key.
 - `.gitignore` excludes `.env` and `backend/.env`.
+- Cloudflare uses environment variables/secrets instead of `.env` files.
 - Backend input is validated before OpenAI is called.
 - Rate limiting is included for demo protection.
 - Output length is limited with `OPENAI_MAX_OUTPUT_TOKENS`.

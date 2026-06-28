@@ -62,6 +62,19 @@ The backend is responsible for:
 - Building the prompt payload.
 - Calling OpenAI through the official OpenAI package.
 
+## Cloudflare Pages Functions
+
+The public portfolio demo can also run on Cloudflare Pages.
+
+Cloudflare files:
+
+- `functions/api/assistants.js`
+- `functions/api/chat.js`
+- `cloudflare/studymate-api.js`
+- `frontend/_routes.json`
+
+Cloudflare serves `frontend/` as static files and runs only `/api/*` as server-side functions. This keeps the OpenAI API key out of the frontend and out of GitHub. The Cloudflare version keeps the same API shape as the local Express backend, but the local Express backend is still better for development because it can read the Markdown Knowledge Base directly from the file system.
+
 ## Assistant Data
 
 Assistant data lives in:

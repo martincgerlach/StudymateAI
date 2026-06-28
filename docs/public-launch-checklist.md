@@ -11,6 +11,9 @@ The goal is not enterprise security. The goal is a safer demo that protects the 
 - Confirm `backend/.env` is not committed to GitHub.
 - Confirm `.gitignore` excludes local `.env` files in the root and backend folders.
 - Confirm raw source files in `knowledge/` are not committed unless you have permission to publish them.
+- If deployed on Cloudflare, set `OPENAI_API_KEY` as a Cloudflare environment secret.
+- If deployed on Cloudflare, use `frontend` as the Pages output directory.
+- If deployed on Cloudflare, confirm `/api/assistants` and `/api/chat` work on the Cloudflare domain.
 - Set a low OpenAI spending limit in the OpenAI Platform.
 - Use a cheap model such as `gpt-4.1-mini`.
 - Keep `OPENAI_MAX_OUTPUT_TOKENS` low enough for demo use.
@@ -32,6 +35,8 @@ ALLOWED_ORIGINS=https://gerlachdesign.dk
 ```
 
 `OPENAI_API_KEY` should be added through the hosting provider's secret/environment variable settings. It should not be written into frontend JavaScript or committed to GitHub.
+
+For Cloudflare Pages, the same values should be added in the Cloudflare dashboard. Do not create a public `.env` file for deployment.
 
 ## Local Development
 

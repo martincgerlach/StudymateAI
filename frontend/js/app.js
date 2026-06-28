@@ -973,7 +973,11 @@ async function sendMessage(message, assistantId) {
     const data = await response.json();
     return data.reply;
   } catch (error) {
-    return getStaticReply(message, assistantId);
+    if (isStaticDemo() || error.name === "TypeError") {
+      return getStaticReply(message, assistantId);
+    }
+
+    throw error;
   }
 }
 
@@ -984,7 +988,7 @@ function getStaticReply(message, assistantId) {
 
 You asked: "${message}"
 
-This is the static GitHub Pages demo. Run the Node/Express backend with an OpenAI API key to get real AI answers.`;
+This is the static demo fallback. Connect the backend or Cloudflare API with an OpenAI API key to get real AI answers.`;
 }
 
 async function handleUserMessage(message, assistantAtSendTime) {
