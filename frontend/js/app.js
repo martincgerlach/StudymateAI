@@ -37,6 +37,110 @@ const characterCounter = document.querySelector("#characterCounter");
 const MAX_MESSAGE_CHARACTERS = 1500;
 const DEMO_SESSION_KEY = "studymate-demo-session";
 const DEMO_ACCOUNTS_KEY = "studymate-demo-accounts";
+const STATIC_ASSISTANTS = [
+  {
+    id: "study-coach",
+    name: "Study Coach",
+    icon: "SC",
+    description: "Helps you understand topics and plan your study work.",
+    shortDescription: "Helps you understand topics and plan your study work.",
+    longDescription:
+      "A broad learning assistant that explains difficult topics clearly, helps with study plans, and connects learning to exam expectations.",
+    exampleQuestions: [
+      "Explain what a user journey is in simple words.",
+      "Make a study plan for my UX assignment.",
+      "Quiz me on basic JavaScript concepts.",
+    ],
+    bestFor: ["Study plans", "Topic explanations", "Exam connection", "Learning structure"],
+    fakeReply:
+      "I can help you break the topic into smaller parts, make a simple study plan, and connect it to what you may need to explain at an exam.",
+  },
+  {
+    id: "coding-mentor",
+    name: "Coding Mentor",
+    icon: "CM",
+    description: "Explains HTML, CSS, JavaScript, APIs, JSON, and bugs.",
+    shortDescription: "Explains HTML, CSS, JavaScript, APIs, JSON, and bugs.",
+    longDescription:
+      "Helps with frontend code, Fetch API, JSON, DOM, bugs, and simple architecture while keeping the solution realistic for a strong 2nd semester Multimedia Design student.",
+    exampleQuestions: [
+      "Explain fetch step by step.",
+      "Why does my event listener not work?",
+      "Show me how JSON is used in JavaScript.",
+    ],
+    bestFor: ["HTML", "CSS", "JavaScript", "APIs", "Debugging"],
+    fakeReply:
+      "I can explain the code step by step and help you debug HTML, CSS, JavaScript, fetch, JSON, and frontend structure in a way you can explain yourself.",
+  },
+  {
+    id: "design-critic",
+    name: "Design Critic",
+    icon: "DC",
+    description: "Gives feedback on hierarchy, spacing, color, and accessibility.",
+    shortDescription: "Gives feedback on hierarchy, spacing, color, and accessibility.",
+    longDescription:
+      "Reviews UI and UX strictly with focus on layout, hierarchy, typography, spacing, colors, accessibility, responsiveness, Figma structure, components, variants, and design systems.",
+    exampleQuestions: [
+      "Critique my dashboard layout.",
+      "What should I check for accessibility?",
+      "How can I improve visual hierarchy?",
+    ],
+    bestFor: ["UI critique", "Figma structure", "Accessibility", "Visual hierarchy", "Design systems"],
+    fakeReply:
+      "I can give strict but useful feedback on hierarchy, spacing, typography, color, accessibility, responsiveness, and Figma structure.",
+  },
+  {
+    id: "ux-researcher",
+    name: "UX Researcher",
+    icon: "UX",
+    description: "Helps with personas, interviews, journeys, and feedback.",
+    shortDescription: "Helps with personas, interviews, journeys, and feedback.",
+    longDescription:
+      "Helps with user interviews, surveys, usability tests, personas, user journeys, feedback analysis, UX documentation, and turning findings into design decisions.",
+    exampleQuestions: [
+      "Write five interview questions for students.",
+      "Help me create a persona.",
+      "How do I analyse user test feedback?",
+    ],
+    bestFor: ["Interviews", "User journeys", "Personas", "Usability tests", "Feedback analysis"],
+    fakeReply:
+      "I can help you plan interviews, personas, user journeys, usability tests, and turn feedback into honest design decisions.",
+  },
+  {
+    id: "exam-coach",
+    name: "Exam Coach",
+    icon: "EX",
+    description: "Asks exam-style questions and challenges your arguments.",
+    shortDescription: "Asks exam-style questions and challenges your arguments.",
+    longDescription:
+      "Acts like a strict Multimedia Design examiner and challenges design, UX, code, process, documentation, group work, and oral exam arguments.",
+    exampleQuestions: [
+      "Ask me exam questions about mobile first.",
+      "Challenge my navigation choice.",
+      "What should I say about my user test?",
+    ],
+    bestFor: ["Exam questions", "Argument practice", "Design decisions", "Code decisions", "Process reflection"],
+    fakeReply:
+      "I can ask realistic exam questions, challenge weak arguments, and help you explain your design, UX, code, testing, and process choices clearly.",
+  },
+  {
+    id: "project-manager",
+    name: "Project Manager",
+    icon: "PM",
+    description: "Helps with tasks, deadlines, group work, and project planning.",
+    shortDescription: "Helps with tasks, deadlines, group work, and project planning.",
+    longDescription:
+      "Helps plan projects, tasks, deadlines, group work, GitHub workflow, documentation, sprint planning, and exam-ready process explanations.",
+    exampleQuestions: [
+      "Make a simple sprint plan.",
+      "Turn my project into a to-do list.",
+      "Help me prioritize before deadline.",
+    ],
+    bestFor: ["To-do lists", "Sprint planning", "Deadlines", "Group work", "Documentation"],
+    fakeReply:
+      "I can help you organize tasks, deadlines, group roles, documentation, and project priorities in a way that is easy to explain later.",
+  },
+];
 
 let assistants = [];
 let selectedAssistant = null;
@@ -349,7 +453,13 @@ function togglePasswordVisibility() {
 
 async function loadAssistants() {
   try {
-    const response = await fetch("/api/assistants");
+    if (isStaticDemo()) {
+      throw new Error("Static demo uses local assistant data");
+    }
+
+    const apiUrl =
+      window.location.protocol === "file:" ? "http://localhost:3000/api/assistants" : "/api/assistants";
+    const response = await fetch(apiUrl);
 
     if (!response.ok) {
       throw new Error("Could not load assistants");
@@ -366,11 +476,24 @@ async function loadAssistants() {
     renderMessages();
     updateSendButton();
   } catch (error) {
-    assistantGrid.innerHTML = `<p class="sidebar-error">Could not load assistants from the backend.</p>`;
-    chatTitle.textContent = "StudyMate AI";
-    activeAssistantDescription.textContent = "The backend assistant data is not available.";
-    sendButton.disabled = true;
+    useStaticAssistants();
   }
+}
+
+function isStaticDemo() {
+  return window.location.hostname.endsWith("github.io");
+}
+
+function useStaticAssistants() {
+  assistants = STATIC_ASSISTANTS;
+  selectedAssistant = assistants[0];
+
+  renderAssistants();
+  renderNewChatAssistants();
+  updateActiveAssistant();
+  renderPromptSuggestions();
+  renderMessages();
+  updateSendButton();
 }
 
 function renderAssistants() {
@@ -824,26 +947,44 @@ function setTemporaryButtonText(button, text) {
 }
 
 async function sendMessage(message, assistantId) {
-  const apiUrl = window.location.protocol === "file:" ? "http://localhost:3000/api/chat" : "/api/chat";
-
-  const response = await fetch(apiUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      assistantId,
-      message,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || "Backend request failed");
+  if (isStaticDemo()) {
+    return getStaticReply(message, assistantId);
   }
 
-  const data = await response.json();
-  return data.reply;
+  const apiUrl = window.location.protocol === "file:" ? "http://localhost:3000/api/chat" : "/api/chat";
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        assistantId,
+        message,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || "Backend request failed");
+    }
+
+    const data = await response.json();
+    return data.reply;
+  } catch (error) {
+    return getStaticReply(message, assistantId);
+  }
+}
+
+function getStaticReply(message, assistantId) {
+  const assistant = assistants.find((item) => item.id === assistantId) || selectedAssistant;
+
+  return `${assistant.name}: ${assistant.fakeReply}
+
+You asked: "${message}"
+
+This is the static GitHub Pages demo. Run the Node/Express backend with an OpenAI API key to get real AI answers.`;
 }
 
 async function handleUserMessage(message, assistantAtSendTime) {
