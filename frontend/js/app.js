@@ -21,7 +21,6 @@ const assistantGrid = document.querySelector("#assistantGrid");
 const activeAssistantIcon = document.querySelector("#activeAssistantIcon");
 const chatTitle = document.querySelector("#chat-title");
 const activeAssistantDescription = document.querySelector("#activeAssistantDescription");
-const bestForList = document.querySelector("#bestForList");
 const chatMessages = document.querySelector("#chatMessages");
 const promptSuggestions = document.querySelector("#promptSuggestions");
 const chatForm = document.querySelector("#chatForm");
@@ -393,6 +392,7 @@ function renderAssistants() {
       <span class="assistant-card-content">
         <h2>${assistant.name}</h2>
         <p>${assistant.shortDescription || assistant.description}</p>
+        ${getAssistantBestForMarkup(assistant)}
       </span>
     `;
 
@@ -462,19 +462,34 @@ function updateActiveAssistant() {
   chatTitle.textContent = selectedAssistant.name;
   activeAssistantDescription.textContent =
     selectedAssistant.shortDescription || selectedAssistant.description;
-
-  renderTags(bestForList, selectedAssistant.bestFor || []);
 }
 
-function renderTags(container, items) {
-  container.innerHTML = "";
+function getAssistantBestForMarkup(assistant) {
+  const bestForItems = assistant.bestFor || [];
 
-  items.forEach((item) => {
-    const tag = document.createElement("span");
-    tag.className = "info-tag";
-    tag.textContent = item;
-    container.appendChild(tag);
-  });
+  if (bestForItems.length === 0) {
+    return "";
+  }
+
+  const tags = bestForItems
+    .map((item) => `<span>${escapeHtml(item)}</span>`)
+    .join("");
+
+  return `
+    <span class="assistant-best-for" aria-hidden="true">
+      <span class="assistant-best-for-label">Best for</span>
+      <span class="assistant-best-for-tags">${tags}</span>
+    </span>
+  `;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function renderPromptSuggestions() {
